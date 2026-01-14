@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "version:major": "npm version major && git push && git push --tags",
+    "version:minor": "npm version minor && git push && git push --tags",
+    "version:patch": "npm version patch && git push && git push --tags"
   },
   "dependencies": {
     "lucide-react": "^0.562.0",
