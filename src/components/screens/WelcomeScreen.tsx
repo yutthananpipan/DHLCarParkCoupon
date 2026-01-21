@@ -1,5 +1,7 @@
 import { User as UserIcon, Car, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
 import { MockUser, ScreenType } from '../../types';
+import ContactModal from '../ContactModal';
 
 interface WelcomeScreenProps {
   readonly mockUser: MockUser;
@@ -7,6 +9,8 @@ interface WelcomeScreenProps {
 }
 
 export default function WelcomeScreen({ mockUser, onNavigate }: WelcomeScreenProps) {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <div className="w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-8 duration-500">
       <div className="grid lg:grid-cols-5 gap-6 lg:gap-8 items-stretch">
@@ -67,7 +71,10 @@ export default function WelcomeScreen({ mockUser, onNavigate }: WelcomeScreenPro
                     </span>
                   </div>
                 </button>
-                <button className="flex items-center gap-2 mx-auto text-gray-900 font-black uppercase tracking-widest text-[10px] opacity-60 hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => setIsContactModalOpen(true)}
+                  className="flex items-center gap-2 mx-auto text-gray-900 font-black uppercase tracking-widest text-[10px] opacity-60 hover:opacity-100 transition-opacity"
+                >
                   <AlertCircle size={14} />
                   แจ้งแก้ไขข้อมูล
                 </button>
@@ -76,6 +83,13 @@ export default function WelcomeScreen({ mockUser, onNavigate }: WelcomeScreenPro
           </div>
         </div>
       </div>
+
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        employeeName={mockUser.name}
+        employeeId={mockUser.id}
+      />
     </div>
   );
 }
