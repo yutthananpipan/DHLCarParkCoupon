@@ -63,7 +63,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col font-sans text-gray-900">
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900 selection:bg-[#FFCC00] selection:text-[#D40511]">
       {isLoading && <LoadingOverlay />}
 
       {currentScreen !== 'login' && (
@@ -105,6 +105,9 @@ export default function App() {
           />
         )}
       </main>
+      <footer className="py-8 text-center text-gray-200 text-[8px] font-black uppercase tracking-[0.4em] pointer-events-none italic">
+        Powered by All System Corp | Simply Delivered
+      </footer>
     </div>
   );
 }

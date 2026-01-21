@@ -1,11 +1,11 @@
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Printer } from 'lucide-react';
 import { ScreenType } from '../../types';
 
 interface VisitorScreenProps {
-  visitorName: string;
-  setVisitorName: (name: string) => void;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  onNavigate: (screen: ScreenType) => void;
+  readonly visitorName: string;
+  readonly setVisitorName: (name: string) => void;
+  readonly onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  readonly onNavigate: (screen: ScreenType) => void;
 }
 
 export default function VisitorScreen({
@@ -15,46 +15,52 @@ export default function VisitorScreen({
   onNavigate,
 }: VisitorScreenProps) {
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 md:p-8 flex flex-col justify-center min-h-[60vh] animate-in fade-in slide-in-from-right-8 duration-300">
-      <div className="mb-8 flex items-center gap-3">
+    <div className="w-full max-w-2xl mx-auto p-4 md:p-6 flex flex-col justify-center min-h-[60vh] animate-in slide-in-from-right-12 duration-500">
+      <div className="mb-8 flex items-center gap-4">
         <button
           onClick={() => onNavigate('reasons')}
-          className="p-2 -ml-2 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-3 bg-white shadow-md text-gray-400 hover:text-[#D40511] rounded-2xl transition-all"
         >
-          <ArrowLeft size={28} />
+          <ArrowLeft size={24} />
         </button>
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">ข้อมูลผู้มาติดต่อ</h2>
-          <p className="text-gray-500">Visitor / Vendor Details</p>
+          <h2 className="text-2xl font-black text-gray-900 uppercase italic tracking-tighter">
+            Visitor Info
+          </h2>
+          <p className="text-gray-400 font-bold uppercase text-[9px] tracking-widest">
+            ขั้นตอนที่ 2: ระบุชื่อผู้มาติดต่อ
+          </p>
         </div>
       </div>
 
-      <div className="bg-white p-6 md:p-10 rounded-3xl shadow-lg border border-gray-100">
-        <form onSubmit={onSubmit} className="space-y-8">
-          <div>
-            <label className="block text-base md:text-lg font-bold text-gray-700 mb-3">
-              ชื่อร้านค้า / ผู้มาติดต่อ (Name of Vendor)
+      <div className="bg-[#FFCC00] p-8 md:p-12 rounded-[40px] shadow-xl border-4 border-white relative overflow-hidden">
+        <form onSubmit={onSubmit} className="space-y-8 relative z-10">
+          <div className="space-y-3">
+            <label
+              htmlFor="visitorName"
+              className="block text-base font-black text-gray-900 uppercase italic tracking-tight ml-1"
+            >
+              Name of Vendor / ผู้มาติดต่อ
             </label>
             <input
+              id="visitorName"
               type="text"
               value={visitorName}
               onChange={(e) => setVisitorName(e.target.value)}
-              className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#D40511] focus:ring-4 focus:ring-red-50 outline-none transition-all text-lg"
-              placeholder="ระบุชื่อผู้มาติดต่อ..."
+              className="w-full px-6 py-4 bg-white border-2 border-transparent focus:border-[#D40511] rounded-2xl outline-none transition-all text-xl font-black shadow-lg placeholder:text-gray-100"
+              placeholder="บริษัท / ชื่อผู้ติดต่อ..."
               autoFocus
             />
           </div>
 
-          <div className="pt-4">
-            <button
-              type="submit"
-              disabled={!visitorName}
-              className="w-full bg-[#D40511] hover:bg-[#b0040e] disabled:bg-gray-200 disabled:text-gray-400 text-white text-lg md:text-xl font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3"
-            >
-              ยืนยันการขอคูปอง
-              <CheckCircle size={24} />
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={!visitorName}
+            className="w-full bg-[#D40511] hover:bg-black disabled:bg-red-300 text-[#FFCC00] text-xl font-black py-5 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-4 uppercase italic tracking-widest"
+          >
+            Confirm
+            <Printer size={28} />
+          </button>
         </form>
       </div>
     </div>

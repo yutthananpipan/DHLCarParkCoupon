@@ -1,73 +1,79 @@
-import { User, ChevronRight } from 'lucide-react';
+import { User as UserIcon, ChevronRight } from 'lucide-react';
+import { DHLLogo } from '../DHLLogo';
 
 interface LoginScreenProps {
-  employeeId: string;
-  setEmployeeId: (id: string) => void;
-  onLogin: (e: React.FormEvent<HTMLFormElement>) => void;
+  readonly employeeId: string;
+  readonly setEmployeeId: (id: string) => void;
+  readonly onLogin: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
 export default function LoginScreen({ employeeId, setEmployeeId, onLogin }: LoginScreenProps) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 bg-gradient-to-br from-gray-50 to-gray-200 w-full min-h-[calc(100vh-80px)]">
-      <div className="w-full max-w-4xl grid md:grid-cols-2 bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[500px]">
-        {/* Left Side: Brand (Visible on Tablet/Desktop) */}
+    <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 bg-[#FFCC00] min-h-screen">
+      <div className="w-full max-w-4xl grid md:grid-cols-2 bg-white rounded-[32px] shadow-2xl overflow-hidden min-h-[500px]">
+        {/* Left Visual Area */}
         <div className="hidden md:flex bg-[#D40511] text-white flex-col justify-center p-12 relative overflow-hidden">
           <div
-            className="absolute top-0 left-0 w-full h-full bg-[#b0040e] opacity-50"
+            className="absolute top-0 left-0 w-full h-full opacity-5"
             style={{
               backgroundImage:
-                'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)',
-              backgroundSize: '24px 24px',
+                'repeating-linear-gradient(45deg, #000, #000 10px, transparent 10px, transparent 20px)',
             }}
           ></div>
           <div className="relative z-10">
-            <div className="bg-[#FFCC00] text-[#D40511] font-black italic text-7xl inline-block px-4 py-2 mb-6 shadow-lg transform -skew-x-12">
-              DHL
+            <div className="bg-[#FFCC00] p-4 mb-8 shadow-xl transform -skew-x-12 inline-block">
+              <DHLLogo className="h-8 lg:h-10" />
             </div>
-            <h2 className="text-4xl font-bold mb-4">Welcome Back</h2>
-            <p className="text-lg text-white/80 leading-relaxed">
-              ระบบขออนุญาตบัตรจอดรถอัตโนมัติ
+            <h2 className="text-4xl font-black mb-4 uppercase italic tracking-tighter leading-none">
+              Smart
               <br />
-              สะดวก รวดเร็ว ใช้งานง่าย
+              Parking
+            </h2>
+            <p className="text-lg text-white/80 font-bold leading-relaxed max-w-xs">
+              ระบบขออนุมัติคูปองจอดรถ
+              <br />
+              เวอร์ชัน 4.0 ทันสมัยและรวดเร็ว
             </p>
           </div>
-          {/* Decorative Circle */}
-          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-[#FFCC00] rounded-full opacity-20 blur-3xl"></div>
+          <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-[#FFCC00] rounded-full opacity-10 blur-2xl"></div>
         </div>
 
-        {/* Right Side: Form */}
-        <div className="p-8 md:p-12 flex flex-col justify-center items-center md:items-start relative">
-          {/* Mobile Logo */}
-          <div className="md:hidden mb-8">
-            <div className="bg-[#FFCC00] text-[#D40511] font-black italic text-5xl px-4 py-1 shadow-md transform -skew-x-12">
-              DHL
-            </div>
+        {/* Login Form Area */}
+        <div className="p-8 md:p-12 flex flex-col justify-center bg-white">
+          <div className="md:hidden mb-10 flex justify-center">
+            <DHLLogo className="h-8" />
           </div>
 
-          <div className="w-full max-w-md mx-auto">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 text-center md:text-left">
-              ลงชื่อเข้าใช้
-            </h1>
-            <p className="text-gray-500 mb-8 text-center md:text-left text-sm md:text-base">
-              กรุณาระบุรหัสพนักงานเพื่อดำเนินการต่อ
-            </p>
+          <div className="w-full max-w-sm mx-auto space-y-8">
+            <div className="text-center md:text-left">
+              <h1 className="text-2xl font-black text-gray-900 uppercase italic tracking-tighter">
+                Sign In
+              </h1>
+              <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] mt-1">
+                Employee Authentication
+              </p>
+            </div>
 
-            <form onSubmit={onLogin} className="space-y-6">
+            <form onSubmit={onLogin} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 ml-1">
-                  รหัสพนักงาน (Employee ID)
+                <label
+                  htmlFor="employeeId"
+                  className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1"
+                >
+                  Employee ID
                 </label>
                 <div className="relative group">
                   <input
+                    id="employeeId"
                     type="number"
                     value={employeeId}
                     onChange={(e) => setEmployeeId(e.target.value)}
-                    className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#D40511] focus:ring-4 focus:ring-red-50 outline-none transition-all text-lg font-medium tracking-widest pl-12"
-                    placeholder="เช่น 724163"
+                    className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:border-[#FFCC00] focus:bg-white outline-none transition-all text-xl font-black tracking-[0.2em] pl-14 shadow-inner"
+                    placeholder="000000"
                     autoFocus
                   />
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#D40511] transition-colors">
-                    <User size={24} />
+                  <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#D40511] transition-colors">
+                    <UserIcon size={22} />
                   </div>
                 </div>
               </div>
@@ -75,16 +81,18 @@ export default function LoginScreen({ employeeId, setEmployeeId, onLogin }: Logi
               <button
                 type="submit"
                 disabled={!employeeId}
-                className="w-full bg-[#D40511] hover:bg-[#b0040e] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-lg font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transform active:scale-[0.99] transition-all flex items-center justify-center gap-3"
+                className="w-full bg-[#D40511] hover:bg-black disabled:bg-gray-100 disabled:text-gray-300 text-[#FFCC00] text-lg font-black py-4 rounded-xl shadow-lg hover:shadow-none transition-all flex items-center justify-center gap-3 uppercase italic tracking-widest"
               >
-                เข้าสู่ระบบ
-                <ChevronRight size={24} />
+                Login
+                <ChevronRight size={20} />
               </button>
             </form>
-          </div>
 
-          <div className="mt-12 w-full text-center md:text-left">
-            <p className="text-xs text-gray-400">Powered by All System Corporation</p>
+            <div className="pt-6 text-center border-t border-gray-50">
+              <p className="text-[8px] font-black text-gray-300 uppercase tracking-[0.3em]">
+                All System Corporation
+              </p>
+            </div>
           </div>
         </div>
       </div>
