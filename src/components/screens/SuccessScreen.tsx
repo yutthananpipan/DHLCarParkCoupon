@@ -65,6 +65,12 @@ export default function SuccessScreen({
         >
           Back to Dashboard
         </button>
+
+        <div className="mt-8 pt-6 border-t border-gray-100">
+          <p className="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em]">
+            All System Corporation Co.,Ltd.
+          </p>
+        </div>
       </div>
     </div>
   );

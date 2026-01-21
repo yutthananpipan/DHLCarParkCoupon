@@ -105,8 +105,8 @@ export default function App() {
           />
         )}
       </main>
-      <footer className="py-8 text-center text-gray-200 text-[8px] font-black uppercase tracking-[0.4em] pointer-events-none italic">
-        Powered by All System Corp | Simply Delivered
+      <footer className="py-8 text-center text-gray-500 text-[8px] font-black uppercase tracking-[0.4em] pointer-events-none italic">
+        Powered by All System Corporation Co.,Ltd. | Simply Delivered
       </footer>
     </div>
   );

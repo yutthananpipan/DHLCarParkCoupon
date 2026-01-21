@@ -25,14 +25,14 @@ export default function LoginScreen({ employeeId, setEmployeeId, onLogin }: Logi
               <DHLLogo className="h-8 lg:h-10" />
             </div>
             <h2 className="text-4xl font-black mb-4 uppercase italic tracking-tighter leading-none">
-              Smart
+              welcome to
               <br />
-              Parking
+              DHL 4.0
             </h2>
             <p className="text-lg text-white/80 font-bold leading-relaxed max-w-xs">
               ระบบขออนุมัติคูปองจอดรถ
               <br />
-              เวอร์ชัน 4.0 ทันสมัยและรวดเร็ว
+              ยกระดับการจัดการ ยกระดับการบริการ
             </p>
           </div>
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-[#FFCC00] rounded-full opacity-10 blur-2xl"></div>
@@ -69,7 +69,7 @@ export default function LoginScreen({ employeeId, setEmployeeId, onLogin }: Logi
                     value={employeeId}
                     onChange={(e) => setEmployeeId(e.target.value)}
                     className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-xl focus:border-[#FFCC00] focus:bg-white outline-none transition-all text-xl font-black tracking-[0.2em] pl-14 shadow-inner"
-                    placeholder="000000"
+                    placeholder="Enter your ID here"
                     autoFocus
                   />
                   <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#D40511] transition-colors">
@@ -87,12 +87,6 @@ export default function LoginScreen({ employeeId, setEmployeeId, onLogin }: Logi
                 <ChevronRight size={20} />
               </button>
             </form>
-
-            <div className="pt-6 text-center border-t border-gray-50">
-              <p className="text-[8px] font-black text-gray-300 uppercase tracking-[0.3em]">
-                All System Corporation
-              </p>
-            </div>
           </div>
         </div>
       </div>
