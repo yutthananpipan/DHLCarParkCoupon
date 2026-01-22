@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ScreenType, Reason } from './types';
 import { mockUser, reasons } from './constants';
+import { apiFetch, API_ENDPOINTS } from './config/api';
 import Header from './components/Header';
 import LoadingOverlay from './components/LoadingOverlay';
 import LoginScreen from './components/screens/LoginScreen';
@@ -9,6 +10,8 @@ import ReasonScreen from './components/screens/ReasonScreen';
 import VisitorScreen from './components/screens/VisitorScreen';
 import SuccessScreen from './components/screens/SuccessScreen';
 
+const STORAGE_KEY = 'dhl-employee-id';
+
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('login');
   const [employeeId, setEmployeeId] = useState<string>('');
@@ -16,17 +19,48 @@ export default function App() {
   const [visitorName, setVisitorName] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  // Check for saved login on mount
+  useEffect(() => {
+    const savedEmployeeId = localStorage.getItem(STORAGE_KEY);
+    if (savedEmployeeId) {
+      setEmployeeId(savedEmployeeId);
+      setCurrentScreen('welcome');
+    }
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!employeeId) return;
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+
+    try {
+      // Call backend API for login
+      const data = await apiFetch<{ success: boolean; employeeId: string }>(
+        API_ENDPOINTS.AUTH.LOGIN,
+        {
+          method: 'POST',
+          body: JSON.stringify({ employeeId }),
+        }
+      );
+
+      if (data.success) {
+        // Save to localStorage
+        localStorage.setItem(STORAGE_KEY, employeeId);
+        setCurrentScreen('welcome');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      // Fallback to local login if backend is not available
+      localStorage.setItem(STORAGE_KEY, employeeId);
       setCurrentScreen('welcome');
-    }, 800);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem(STORAGE_KEY);
     setEmployeeId('');
     setSelectedReason(null);
     setVisitorName('');
@@ -106,7 +140,7 @@ export default function App() {
         )}
       </main>
       <footer className="py-8 text-center text-gray-500 text-[8px] font-black uppercase tracking-[0.4em] pointer-events-none italic">
-        Powered by All System Corporation Co.,Ltd. | Simply Delivered
+        Powered by All System Corporation Co.,Ltd.
       </footer>
     </div>
   );

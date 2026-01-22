@@ -35,14 +35,14 @@ check_docker() {
 # Function to build the Docker image
 build() {
     print_info "Building Docker image..."
-    docker-compose build
+    docker compose build
     print_info "Build completed successfully!"
 }
 
 # Function to start the application
 start() {
     print_info "Starting application..."
-    docker-compose up -d
+    docker compose up -d --remove-orphans
     print_info "Application started successfully!"
     print_info "Access the app at: http://localhost"
 }
@@ -50,7 +50,7 @@ start() {
 # Function to stop the application
 stop() {
     print_info "Stopping application..."
-    docker-compose down
+    docker compose down
     print_info "Application stopped successfully!"
 }
 
@@ -64,13 +64,13 @@ restart() {
 # Function to view logs
 logs() {
     print_info "Viewing application logs (Press Ctrl+C to exit)..."
-    docker-compose logs -f
+    docker compose logs -f
 }
 
 # Function to check application status
 status() {
     print_info "Checking application status..."
-    docker-compose ps
+    docker compose ps
     echo ""
     print_info "Checking health status..."
     if curl -f http://localhost/health > /dev/null 2>&1; then
@@ -87,7 +87,7 @@ clean() {
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_info "Cleaning up..."
-        docker-compose down -v --rmi all
+        docker compose down -v --rmi all
         print_info "Cleanup completed!"
     else
         print_info "Cleanup cancelled."
@@ -97,9 +97,9 @@ clean() {
 # Function to rebuild and restart
 rebuild() {
     print_info "Rebuilding and restarting application..."
-    docker-compose down
-    docker-compose build --no-cache
-    docker-compose up -d
+    docker compose down
+    docker compose build --no-cache
+    docker compose up -d --remove-orphans
     print_info "Rebuild completed successfully!"
     print_info "Access the app at: http://localhost"
 }
