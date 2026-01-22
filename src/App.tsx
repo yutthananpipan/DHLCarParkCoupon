@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ScreenType, Reason } from './types';
 import { mockUser, reasons } from './constants';
 import { apiFetch, API_ENDPOINTS } from './config/api';
+import packageJson from '../package.json';
 import Header from './components/Header';
 import LoadingOverlay from './components/LoadingOverlay';
 import LoginScreen from './components/screens/LoginScreen';
@@ -82,12 +83,42 @@ export default function App() {
     processRequest();
   };
 
-  const processRequest = () => {
+  const processRequest = async () => {
     setIsLoading(true);
-    setTimeout(() => {
+
+    try {
+      // Call printer API
+      const printData = {
+        employeeId,
+        reason: selectedReason?.label || 'Unknown',
+        visitorName: visitorName || undefined,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Simulate realistic printing time (3-5 seconds)
+      // This ensures the loading screen shows long enough for the actual print process
+      const [printResponse] = await Promise.all([
+        apiFetch<{ success: boolean; message: string }>(API_ENDPOINTS.PRINTER.PRINT, {
+          method: 'POST',
+          body: JSON.stringify(printData),
+        }),
+        // Minimum delay to simulate actual printing process:
+        // - Preparing data: ~1s
+        // - Printing slip: ~3s
+        // - Cutting paper: ~1s
+        new Promise((resolve) => setTimeout(resolve, 5000)),
+      ]);
+
+      console.log('Print job sent successfully:', printResponse);
+    } catch (error) {
+      console.error('Print error:', error);
+      // Continue to success screen even if print fails
+      // But still wait for minimum print time
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    } finally {
       setIsLoading(false);
       setCurrentScreen('success');
-    }, 1500);
+    }
   };
 
   const handleBackToHome = () => {
@@ -139,8 +170,13 @@ export default function App() {
           />
         )}
       </main>
-      <footer className="py-8 text-center text-gray-500 text-[8px] font-black uppercase tracking-[0.4em] pointer-events-none italic">
-        Powered by All System Corporation Co.,Ltd.
+      <footer className="py-8 text-center text-gray-500 space-y-1">
+        <p className="text-[8px] font-black uppercase tracking-[0.4em] italic">
+          Powered by All System Corporation Co.,Ltd.
+        </p>
+        <p className="text-[7px] font-bold uppercase tracking-widest opacity-60">
+          Version {packageJson.version}
+        </p>
       </footer>
     </div>
   );
