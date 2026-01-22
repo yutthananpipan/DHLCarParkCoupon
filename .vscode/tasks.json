@@ -4,10 +4,20 @@
     {
       "type": "npm",
       "script": "dev",
-      "problemMatcher": [],
       "label": "npm: dev",
       "detail": "vite",
       "isBackground": true,
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE",
+          "endsPattern": "(Local|ready)"
+        }
+      },
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -20,16 +30,49 @@
     {
       "type": "npm",
       "script": "build",
-      "problemMatcher": [],
       "label": "npm: build",
-      "detail": "tsc -b && vite build"
+      "detail": "vite build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$tsc", "$eslint-stylish"]
     },
     {
       "type": "npm",
       "script": "preview",
-      "problemMatcher": [],
       "label": "npm: preview",
-      "detail": "vite preview"
+      "detail": "vite preview",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "lint",
+      "label": "npm: lint",
+      "detail": "eslint .",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "type": "npm",
+      "script": "lint:fix",
+      "label": "npm: lint:fix",
+      "detail": "eslint . --fix",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "type": "npm",
+      "script": "format",
+      "label": "npm: format",
+      "detail": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "type-check",
+      "label": "npm: type-check",
+      "detail": "tsc --noEmit",
+      "problemMatcher": ["$tsc"]
     }
   ]
 }
