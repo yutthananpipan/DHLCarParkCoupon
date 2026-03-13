@@ -36,6 +36,10 @@ dist-ssr
 
 # Testing
 coverage
+tests/reports/
+test-results/
+playwright-report/
+blob-report/
 
 # Build
 build

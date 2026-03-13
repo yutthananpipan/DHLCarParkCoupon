@@ -110,9 +110,14 @@ export default function DetailInputScreen({
 }: DetailInputScreenProps) {
   const [touched, setTouched] = useState(false);
 
+  // BUG-04 fix: trim whitespace for validation
+  const isValid = value.trim().length > 0;
+
   const handleNext = () => {
     setTouched(true);
-    if (!value) return;
+    if (!isValid) return;
+    // Store trimmed value
+    onChange(value.trim());
     onNext();
   };
 
@@ -145,11 +150,15 @@ export default function DetailInputScreen({
           {config.type === 'text' ? (
             <input
               type="text"
+              inputMode="text"
+              autoCapitalize="words"
               value={value}
               onChange={(e) => onChange(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleNext()}
               className={`w-full px-6 py-4 bg-white border-2 ${
-                touched && !value ? 'border-[#D40511]' : 'border-transparent focus:border-[#D40511]'
+                touched && !isValid
+                  ? 'border-[#D40511]'
+                  : 'border-transparent focus:border-gray-300'
               } rounded-2xl outline-none focus:outline-none focus:ring-0 transition-all text-xl font-black shadow-lg placeholder:text-gray-300`}
               placeholder={config.placeholder ?? ''}
               autoFocus
@@ -158,7 +167,7 @@ export default function DetailInputScreen({
             <CustomSelect options={config.options ?? []} value={value} onChange={onChange} />
           )}
 
-          {touched && !value && (
+          {touched && !isValid && (
             <p className="text-[#D40511] font-bold text-sm">กรุณากรอกข้อมูลก่อนดำเนินการต่อ</p>
           )}
 
@@ -170,9 +179,10 @@ export default function DetailInputScreen({
               <ArrowLeft size={18} />
               Back
             </button>
+            {/* BUG-05 fix: always red, darker on hover (not black) */}
             <button
               onClick={handleNext}
-              className="flex-1 px-6 py-4 bg-[#D40511] hover:bg-black text-white font-black uppercase italic rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg tracking-tight flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-4 bg-[#D40511] hover:bg-[#b0040e] text-white font-black uppercase italic rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg tracking-tight flex items-center justify-center gap-2"
             >
               Next
               <ArrowRight size={18} />

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { CheckCircle, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { CheckCircle, Clock, Pause } from 'lucide-react';
 import { MockUser, Reason } from '../../types';
 
 interface SuccessScreenProps {
@@ -35,21 +35,23 @@ export default function SuccessScreen({
   onBackToHome,
 }: SuccessScreenProps) {
   const [countdown, setCountdown] = useState(AUTO_REDIRECT_SECONDS);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const stableBackToHome = useCallback(onBackToHome, [onBackToHome]);
-
+  // Decrement countdown (separate from redirect trigger)
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          stableBackToHome();
-          return 0;
-        }
-        return prev - 1;
-      });
+    if (isPaused || countdown <= 0) return;
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
     }, 1000);
-    return () => clearInterval(timer);
-  }, [stableBackToHome]);
+    return () => clearTimeout(timer);
+  }, [countdown, isPaused]);
+
+  // Trigger redirect when countdown reaches 0 (runs after render, not during)
+  useEffect(() => {
+    if (countdown <= 0 && !isPaused) {
+      onBackToHome();
+    }
+  }, [countdown, isPaused, onBackToHome]);
 
   const detailLabel = getDetailLabel(selectedReason?.id);
   const now = new Date();
@@ -80,14 +82,12 @@ export default function SuccessScreen({
 
         {/* Receipt-style card */}
         <div className="bg-gray-50 rounded-3xl w-full mb-6 overflow-hidden border border-gray-100">
-          {/* Receipt header */}
           <div className="bg-gray-900 text-white p-4">
             <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#FFCC00]">
               Coupon Receipt
             </p>
           </div>
 
-          {/* Receipt body */}
           <div className="p-5 space-y-3 text-left">
             <div className="flex justify-between items-center pb-3 border-b border-dashed border-gray-200">
               <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
@@ -141,23 +141,42 @@ export default function SuccessScreen({
           </div>
         </div>
 
-        {/* Auto-redirect countdown */}
-        <div className="flex items-center justify-center gap-2 text-gray-400 mb-6">
-          <Clock size={14} />
-          <p className="text-xs font-bold">
-            กลับหน้าหลักอัตโนมัติใน <span className="text-[#D40511] font-black">{countdown}</span>{' '}
-            วินาที
-          </p>
-        </div>
+        {/* Auto-redirect countdown — more prominent (UX-02) */}
+        <div className="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
+          <div className="flex items-center justify-center gap-3 text-gray-600">
+            <Clock size={18} />
+            <p className="text-sm font-bold">
+              {isPaused ? (
+                'หยุดนับถอยหลังแล้ว'
+              ) : (
+                <>
+                  กลับหน้าหลักอัตโนมัติใน{' '}
+                  <span className="text-[#D40511] font-black text-lg">{countdown}</span> วินาที
+                </>
+              )}
+            </p>
+            {!isPaused && (
+              <button
+                onClick={() => setIsPaused(true)}
+                className="p-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors"
+                title="หยุดนับถอยหลัง"
+              >
+                <Pause size={14} className="text-gray-600" />
+              </button>
+            )}
+          </div>
 
-        {/* Progress bar */}
-        <div className="w-full bg-gray-100 rounded-full h-1 mb-6 overflow-hidden">
-          <div
-            className="h-full bg-[#D40511] rounded-full transition-all duration-1000 ease-linear"
-            style={{
-              width: `${((AUTO_REDIRECT_SECONDS - countdown) / AUTO_REDIRECT_SECONDS) * 100}%`,
-            }}
-          />
+          {/* Progress bar */}
+          {!isPaused && (
+            <div className="w-full bg-gray-200 rounded-full h-1.5 mt-3 overflow-hidden">
+              <div
+                className="h-full bg-[#D40511] rounded-full transition-all duration-1000 ease-linear"
+                style={{
+                  width: `${((AUTO_REDIRECT_SECONDS - countdown) / AUTO_REDIRECT_SECONDS) * 100}%`,
+                }}
+              />
+            </div>
+          )}
         </div>
 
         <button

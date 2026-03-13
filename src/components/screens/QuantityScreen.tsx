@@ -52,16 +52,16 @@ export default function QuantityScreen({
             Select Quantity / เลือกจำนวน
           </p>
 
-          {/* Visual Grid Buttons */}
+          {/* BUG-09 fix: explicit bg-white, focus:outline-none, no ambiguous hover */}
           <div className="grid grid-cols-5 gap-3">
             {QUANTITY_OPTIONS.map((n) => (
               <button
                 key={n}
                 onClick={() => onQuantityChange(n)}
-                className={`aspect-square rounded-2xl font-black text-2xl md:text-3xl transition-all duration-200 ${
+                className={`aspect-square rounded-2xl font-black text-2xl md:text-3xl transition-all duration-200 outline-none focus:outline-none ${
                   quantity === n
                     ? 'bg-[#D40511] text-white shadow-lg scale-110 ring-4 ring-[#D40511]/30'
-                    : 'bg-white text-gray-700 hover:bg-white/80 shadow-md hover:scale-105 active:scale-95'
+                    : 'bg-white text-gray-700 shadow-md hover:bg-gray-50 hover:scale-105 active:scale-95 focus:bg-white'
                 }`}
               >
                 {n}
@@ -90,9 +90,10 @@ export default function QuantityScreen({
               <ArrowLeft size={18} />
               Back
             </button>
+            {/* BUG-10 fix: whitespace-nowrap + smaller text on mobile */}
             <button
               onClick={onConfirm}
-              className="flex-1 px-6 py-4 bg-[#D40511] hover:bg-black text-white font-black uppercase italic rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg tracking-tight flex items-center justify-center gap-2"
+              className="flex-1 px-4 md:px-6 py-4 bg-[#D40511] hover:bg-[#b0040e] text-white font-black uppercase italic rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-lg tracking-tight flex items-center justify-center gap-2 whitespace-nowrap text-sm md:text-base"
             >
               Confirm & Print
               <Printer size={18} />

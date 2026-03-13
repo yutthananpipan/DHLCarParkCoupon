@@ -199,6 +199,7 @@ export default function App() {
         {currentScreen === 'reasons' && (
           <ReasonScreen
             reasons={reasons}
+            selectedReason={selectedReason}
             onSelectReason={handleReasonSelect}
             onNavigate={setCurrentScreen}
           />

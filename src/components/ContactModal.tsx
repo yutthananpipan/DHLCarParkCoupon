@@ -19,16 +19,34 @@ export default function ContactModal({
     dataToCorrect: '',
     reason: '',
   });
+  // BUG-06 fix: custom validation state with Thai messages
+  const [errors, setErrors] = useState<{ dataToCorrect?: string; reason?: string }>({});
 
   if (!isOpen) return null;
 
+  const validate = (): boolean => {
+    const newErrors: { dataToCorrect?: string; reason?: string } = {};
+
+    if (!formData.dataToCorrect.trim()) {
+      newErrors.dataToCorrect = 'กรุณาระบุข้อมูลที่ต้องการแก้ไข';
+    }
+    if (!formData.reason.trim()) {
+      newErrors.reason = 'กรุณาระบุเหตุผลในการแก้ไข';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Send to backend API when integrated
+    if (!validate()) return;
+
     console.log('Submitting correction request:', {
       employeeName,
       employeeId,
-      ...formData,
+      dataToCorrect: formData.dataToCorrect.trim(),
+      reason: formData.reason.trim(),
     });
     setIsSubmitted(true);
   };
@@ -36,6 +54,7 @@ export default function ContactModal({
   const handleClose = () => {
     setIsSubmitted(false);
     setFormData({ dataToCorrect: '', reason: '' });
+    setErrors({});
     onClose();
   };
 
@@ -96,7 +115,7 @@ export default function ContactModal({
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4 md:space-y-6">
               {/* Employee Info (Read-only) */}
               <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 md:p-5 border border-gray-100">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
@@ -125,13 +144,26 @@ export default function ContactModal({
                 </label>
                 <textarea
                   id="dataToCorrect"
-                  required
                   value={formData.dataToCorrect}
-                  onChange={(e) => setFormData({ ...formData, dataToCorrect: e.target.value })}
-                  className="w-full px-4 py-3 md:px-5 md:py-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#FFCC00] focus:bg-white outline-none transition-all text-sm md:text-base resize-none"
+                  onChange={(e) => {
+                    setFormData({ ...formData, dataToCorrect: e.target.value });
+                    if (errors.dataToCorrect) {
+                      setErrors({ ...errors, dataToCorrect: undefined });
+                    }
+                  }}
+                  inputMode="text"
+                  autoCapitalize="sentences"
+                  className={`w-full px-4 py-3 md:px-5 md:py-4 bg-gray-50 border-2 ${
+                    errors.dataToCorrect
+                      ? 'border-[#D40511] bg-red-50/30'
+                      : 'border-gray-200 focus:border-[#FFCC00]'
+                  } rounded-xl focus:bg-white outline-none transition-all text-sm md:text-base resize-none`}
                   rows={3}
                   placeholder="ระบุข้อมูลที่ต้องการแก้ไข เช่น ชื่อ-นามสกุล, แผนก, ตำแหน่ง..."
                 />
+                {errors.dataToCorrect && (
+                  <p className="text-[#D40511] font-bold text-xs">{errors.dataToCorrect}</p>
+                )}
               </div>
 
               {/* Reason */}
@@ -144,13 +176,26 @@ export default function ContactModal({
                 </label>
                 <textarea
                   id="reason"
-                  required
                   value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  className="w-full px-4 py-3 md:px-5 md:py-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-[#FFCC00] focus:bg-white outline-none transition-all text-sm md:text-base resize-none"
+                  onChange={(e) => {
+                    setFormData({ ...formData, reason: e.target.value });
+                    if (errors.reason) {
+                      setErrors({ ...errors, reason: undefined });
+                    }
+                  }}
+                  inputMode="text"
+                  autoCapitalize="sentences"
+                  className={`w-full px-4 py-3 md:px-5 md:py-4 bg-gray-50 border-2 ${
+                    errors.reason
+                      ? 'border-[#D40511] bg-red-50/30'
+                      : 'border-gray-200 focus:border-[#FFCC00]'
+                  } rounded-xl focus:bg-white outline-none transition-all text-sm md:text-base resize-none`}
                   rows={3}
                   placeholder="โปรดระบุเหตุผลที่ต้องการแก้ไขข้อมูล..."
                 />
+                {errors.reason && (
+                  <p className="text-[#D40511] font-bold text-xs">{errors.reason}</p>
+                )}
               </div>
 
               {/* Info Box */}
@@ -165,7 +210,7 @@ export default function ContactModal({
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[#D40511] hover:bg-black text-[#FFCC00] font-black py-3 md:py-4 rounded-xl md:rounded-2xl transition-all uppercase italic tracking-widest text-sm md:text-base shadow-lg flex items-center justify-center gap-2 md:gap-3"
+                className="w-full bg-[#D40511] hover:bg-[#b0040e] text-[#FFCC00] font-black py-3 md:py-4 rounded-xl md:rounded-2xl transition-all uppercase italic tracking-widest text-sm md:text-base shadow-lg flex items-center justify-center gap-2 md:gap-3"
               >
                 <Send size={18} className="md:w-5 md:h-5" />
                 ส่งคำขอแก้ไข
