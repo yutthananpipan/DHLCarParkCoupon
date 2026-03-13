@@ -1,5 +1,5 @@
-import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, ArrowRight, ChevronDown, Check } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { DetailInputConfig, ScreenType } from '../../types';
 
 interface DetailInputScreenProps {
@@ -9,6 +9,95 @@ interface DetailInputScreenProps {
   readonly onNext: () => void;
   readonly onNavigate: (screen: ScreenType) => void;
   readonly stepLabel: string;
+}
+
+interface CustomSelectProps {
+  readonly options: string[];
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+}
+
+function CustomSelect({ options, value, onChange }: CustomSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
+  const handleSelect = (opt: string) => {
+    onChange(opt);
+    setIsOpen(false);
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      {/* Trigger button */}
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className={`w-full px-6 py-4 pr-14 bg-white rounded-2xl shadow-lg text-xl font-black text-left transition-all border-2 relative ${
+          isOpen ? 'border-[#D40511] shadow-xl' : 'border-transparent hover:border-gray-200'
+        }`}
+      >
+        {value || options[0]}
+        <div
+          className={`absolute right-5 top-1/2 transition-transform duration-200 ${
+            isOpen ? 'text-[#D40511]' : 'text-gray-400'
+          }`}
+          style={{ transform: `translateY(-50%) rotate(${isOpen ? 180 : 0}deg)` }}
+        >
+          <ChevronDown size={24} />
+        </div>
+      </button>
+
+      {/* Dropdown list */}
+      {isOpen && (
+        <>
+          {/* Mobile backdrop for better UX */}
+          <div className="fixed inset-0 z-40 md:hidden" onClick={() => setIsOpen(false)} />
+
+          <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl overflow-hidden z-50 border border-gray-200 max-h-[60vh] overflow-y-auto">
+            {options.map((opt, index) => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => handleSelect(opt)}
+                className={`w-full px-6 py-5 md:py-4 text-left font-black text-lg flex items-center justify-between transition-all active:scale-[0.98] ${
+                  opt === value
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                } ${index < options.length - 1 ? 'border-b border-gray-100' : ''}`}
+              >
+                <span className="flex items-center gap-3">
+                  <span
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black shrink-0 ${
+                      opt === value ? 'bg-[#D40511] text-white' : 'bg-gray-100 text-gray-400'
+                    }`}
+                  >
+                    {index + 1}
+                  </span>
+                  {opt}
+                </span>
+                {opt === value && <Check size={20} className="text-[#FFCC00] shrink-0" />}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 export default function DetailInputScreen({
@@ -51,7 +140,7 @@ export default function DetailInputScreen({
         </div>
       </div>
 
-      <div className="bg-[#FFCC00] p-8 md:p-10 rounded-[40px] shadow-xl border-4 border-white relative overflow-hidden">
+      <div className="bg-[#FFCC00] p-8 md:p-10 rounded-[40px] shadow-xl border-4 border-white relative overflow-visible">
         <div className="space-y-6 relative z-10">
           {config.type === 'text' ? (
             <input
@@ -66,23 +155,7 @@ export default function DetailInputScreen({
               autoFocus
             />
           ) : (
-            <div className="relative">
-              <select
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-full px-6 py-4 pr-14 bg-white border-2 border-transparent focus:border-[#D40511] rounded-2xl outline-none focus:outline-none focus:ring-0 transition-all text-xl font-black shadow-lg appearance-none cursor-pointer"
-                autoFocus
-              >
-                {config.options?.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                <ChevronDown size={24} />
-              </div>
-            </div>
+            <CustomSelect options={config.options ?? []} value={value} onChange={onChange} />
           )}
 
           {touched && !value && (
