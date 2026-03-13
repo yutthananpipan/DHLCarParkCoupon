@@ -8,6 +8,13 @@ interface WelcomeScreenProps {
   readonly onNavigate: (screen: ScreenType) => void;
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'สวัสดีตอนเช้า';
+  if (hour < 17) return 'สวัสดีตอนบ่าย';
+  return 'สวัสดีตอนเย็น';
+}
+
 export default function WelcomeScreen({ mockUser, onNavigate }: WelcomeScreenProps) {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
@@ -25,7 +32,7 @@ export default function WelcomeScreen({ mockUser, onNavigate }: WelcomeScreenPro
                   <UserIcon size={40} className="text-[#FFCC00]" />
                 </div>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
-                  Welcome
+                  {getGreeting()}
                 </p>
                 <h2 className="text-3xl lg:text-4xl font-black text-gray-900 leading-tight mb-2">
                   {mockUser.name}

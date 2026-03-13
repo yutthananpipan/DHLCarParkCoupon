@@ -1,4 +1,19 @@
-export type ScreenType = 'login' | 'welcome' | 'reasons' | 'visitor-input' | 'success';
+export type ScreenType =
+  | 'login'
+  | 'welcome'
+  | 'reasons'
+  | 'detail-input'
+  | 'quantity-input'
+  | 'gmnc-confirm'
+  | 'success';
+
+export interface DetailInputConfig {
+  titleEn: string;
+  titleTh: string;
+  type: 'text' | 'select';
+  options?: string[];
+  placeholder?: string;
+}
 
 export interface Reason {
   id: string;

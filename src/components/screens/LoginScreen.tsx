@@ -1,5 +1,4 @@
 import { User as UserIcon, ChevronRight } from 'lucide-react';
-import { DHLLogo } from '../DHLLogo';
 
 interface LoginScreenProps {
   readonly employeeId: string;
@@ -20,30 +19,31 @@ export default function LoginScreen({ employeeId, setEmployeeId, onLogin }: Logi
                 'repeating-linear-gradient(45deg, #000, #000 10px, transparent 10px, transparent 20px)',
             }}
           ></div>
-          <div className="relative z-10">
-            <div className="bg-[#FFCC00] p-4 mb-8 shadow-xl transform -skew-x-12 inline-block">
-              <DHLLogo className="h-8 lg:h-10" />
+          <div className="relative z-10 flex flex-col justify-between h-full">
+            <div>
+              <h2 className="text-4xl font-black mb-4 uppercase italic tracking-tighter leading-none">
+                Car Park
+                <br />
+                Coupon
+              </h2>
+              <p className="text-lg text-white/80 font-bold leading-relaxed max-w-xs">
+                ระบบขออนุมัติคูปองจอดรถ
+                <br />
+                ยกระดับการจัดการ ยกระดับการบริการ
+              </p>
             </div>
-            <h2 className="text-4xl font-black mb-4 uppercase italic tracking-tighter leading-none">
-              welcome to
-              <br />
-              DHL 4.0
-            </h2>
-            <p className="text-lg text-white/80 font-bold leading-relaxed max-w-xs">
-              ระบบขออนุมัติคูปองจอดรถ
-              <br />
-              ยกระดับการจัดการ ยกระดับการบริการ
-            </p>
+            {/* AllSystem logo placeholder */}
+            <div className="mt-12 border-2 border-dashed border-white/30 rounded-xl px-6 py-4 inline-flex items-center justify-center opacity-50">
+              <span className="text-white/70 text-xs font-bold uppercase tracking-widest">
+                AllSystem Logo
+              </span>
+            </div>
           </div>
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-[#FFCC00] rounded-full opacity-10 blur-2xl"></div>
         </div>
 
         {/* Login Form Area */}
         <div className="p-8 md:p-12 flex flex-col justify-center bg-white">
-          <div className="md:hidden mb-10 flex justify-center">
-            <DHLLogo className="h-8" />
-          </div>
-
           <div className="w-full max-w-sm mx-auto space-y-8">
             <div className="text-center md:text-left">
               <h1 className="text-2xl font-black text-gray-900 uppercase italic tracking-tighter">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ScreenType, Reason } from './types';
+import { ScreenType, Reason, DetailInputConfig } from './types';
 import { mockUser, reasons } from './constants';
 import { apiFetch, API_ENDPOINTS } from './config/api';
 import packageJson from '../package.json';
@@ -8,19 +8,57 @@ import LoadingOverlay from './components/LoadingOverlay';
 import LoginScreen from './components/screens/LoginScreen';
 import WelcomeScreen from './components/screens/WelcomeScreen';
 import ReasonScreen from './components/screens/ReasonScreen';
-import VisitorScreen from './components/screens/VisitorScreen';
+import DetailInputScreen from './components/screens/DetailInputScreen';
+import QuantityScreen from './components/screens/QuantityScreen';
+import GmncScreen from './components/screens/GmncScreen';
 import SuccessScreen from './components/screens/SuccessScreen';
 
 const STORAGE_KEY = 'dhl-employee-id';
+
+const DETAIL_CONFIGS: Record<string, DetailInputConfig> = {
+  visitors: {
+    titleEn: 'Please Specify Name of Vendor',
+    titleTh: 'กรุณาระบุชื่อร้านค้าผู้มาติดต่อ',
+    type: 'text',
+    placeholder: 'บริษัท / ชื่อผู้ติดต่อ...',
+  },
+  training: {
+    titleEn: 'Please Specify Training Subject',
+    titleTh: 'กรุณาระบุหัวข้อฝึกอบรม',
+    type: 'select',
+    options: ['CIS', 'CIM', 'AMAZON', 'OTHERS'],
+  },
+  meeting: {
+    titleEn: 'Please Specify Meeting Subject',
+    titleTh: 'กรุณาระบุหัวข้อประชุม',
+    type: 'text',
+    placeholder: 'หัวข้อการประชุม...',
+  },
+  other: {
+    titleEn: 'Please Enter Reason for Coupon',
+    titleTh: 'กรุณาระบุเหตุผลของท่าน',
+    type: 'text',
+    placeholder: 'ระบุเหตุผล...',
+  },
+};
+
+function getStepLabel(reasonId: string, screen: ScreenType): string {
+  if (screen === 'detail-input') return 'Step 02';
+  if (screen === 'quantity-input') {
+    return reasonId === 'outing' ? 'Step 02' : 'Step 03';
+  }
+  return 'Step 02';
+}
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('login');
   const [employeeId, setEmployeeId] = useState<string>('');
   const [selectedReason, setSelectedReason] = useState<Reason | null>(null);
-  const [visitorName, setVisitorName] = useState<string>('');
+  const [detailInputConfig, setDetailInputConfig] = useState<DetailInputConfig | null>(null);
+  const [detailValue, setDetailValue] = useState<string>('');
+  const [quantity, setQuantity] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Check for saved login on mount
   useEffect(() => {
     const savedEmployeeId = localStorage.getItem(STORAGE_KEY);
     if (savedEmployeeId) {
@@ -35,7 +73,6 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      // Call backend API for login
       const data = await apiFetch<{ success: boolean; employeeId: string }>(
         API_ENDPOINTS.AUTH.LOGIN,
         {
@@ -45,13 +82,11 @@ export default function App() {
       );
 
       if (data.success) {
-        // Save to localStorage
         localStorage.setItem(STORAGE_KEY, employeeId);
         setCurrentScreen('welcome');
       }
     } catch (error) {
       console.error('Login error:', error);
-      // Fallback to local login if backend is not available
       localStorage.setItem(STORAGE_KEY, employeeId);
       setCurrentScreen('welcome');
     } finally {
@@ -60,60 +95,74 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    // Clear localStorage
     localStorage.removeItem(STORAGE_KEY);
     setEmployeeId('');
     setSelectedReason(null);
-    setVisitorName('');
+    setDetailValue('');
+    setQuantity(1);
     setCurrentScreen('login');
   };
 
   const handleReasonSelect = (reason: Reason) => {
     setSelectedReason(reason);
-    if (reason.id === 'visitors') {
-      setCurrentScreen('visitor-input');
-    } else {
-      processRequest();
+    setDetailValue('');
+    setQuantity(1);
+
+    switch (reason.id) {
+      case 'visitors':
+      case 'training':
+      case 'meeting':
+      case 'other': {
+        const config = DETAIL_CONFIGS[reason.id];
+        setDetailInputConfig(config);
+        // Pre-select first option for dropdowns
+        if (config.type === 'select' && config.options?.length) {
+          setDetailValue(config.options[0]);
+        }
+        setCurrentScreen('detail-input');
+        break;
+      }
+      case 'gmnc':
+        setCurrentScreen('gmnc-confirm');
+        break;
+      case 'outing':
+        setCurrentScreen('quantity-input');
+        break;
     }
   };
 
-  const submitVisitor = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!visitorName) return;
-    processRequest();
+  const handleDetailNext = () => {
+    setCurrentScreen('quantity-input');
   };
 
-  const processRequest = async () => {
+  const handleGmncConfirm = () => {
+    setQuantity(1);
+    processRequest(1);
+  };
+
+  const processRequest = async (qty?: number) => {
     setIsLoading(true);
 
     try {
-      // Call printer API
       const printData = {
         employeeId,
-        reason: selectedReason?.label || 'Unknown',
-        visitorName: visitorName || undefined,
+        reason: selectedReason?.label ?? 'Unknown',
+        detail: detailValue || undefined,
+        quantity: qty ?? quantity,
         timestamp: new Date().toISOString(),
       };
 
-      // Simulate realistic printing time (3-5 seconds)
-      // This ensures the loading screen shows long enough for the actual print process
       const [printResponse] = await Promise.all([
         apiFetch<{ success: boolean; message: string }>(API_ENDPOINTS.PRINTER.PRINT, {
           method: 'POST',
           body: JSON.stringify(printData),
         }),
-        // Minimum delay to simulate actual printing process:
-        // - Preparing data: ~1s
-        // - Printing slip: ~3s
-        // - Cutting paper: ~1s
         new Promise((resolve) => setTimeout(resolve, 5000)),
       ]);
 
       console.log('Print job sent successfully:', printResponse);
     } catch (error) {
       console.error('Print error:', error);
-      // Continue to success screen even if print fails
-      // But still wait for minimum print time
       await new Promise((resolve) => setTimeout(resolve, 5000));
     } finally {
       setIsLoading(false);
@@ -122,7 +171,8 @@ export default function App() {
   };
 
   const handleBackToHome = () => {
-    setVisitorName('');
+    setDetailValue('');
+    setQuantity(1);
     setSelectedReason(null);
     setCurrentScreen('welcome');
   };
@@ -153,19 +203,35 @@ export default function App() {
             onNavigate={setCurrentScreen}
           />
         )}
-        {currentScreen === 'visitor-input' && (
-          <VisitorScreen
-            visitorName={visitorName}
-            setVisitorName={setVisitorName}
-            onSubmit={submitVisitor}
+        {currentScreen === 'detail-input' && detailInputConfig && (
+          <DetailInputScreen
+            config={detailInputConfig}
+            value={detailValue}
+            onChange={setDetailValue}
+            onNext={handleDetailNext}
             onNavigate={setCurrentScreen}
+            stepLabel={getStepLabel(selectedReason?.id ?? '', 'detail-input')}
           />
+        )}
+        {currentScreen === 'quantity-input' && (
+          <QuantityScreen
+            quantity={quantity}
+            onQuantityChange={setQuantity}
+            selectedReason={selectedReason}
+            onConfirm={() => processRequest()}
+            onNavigate={setCurrentScreen}
+            stepLabel={getStepLabel(selectedReason?.id ?? '', 'quantity-input')}
+          />
+        )}
+        {currentScreen === 'gmnc-confirm' && (
+          <GmncScreen onConfirm={handleGmncConfirm} onNavigate={setCurrentScreen} />
         )}
         {currentScreen === 'success' && (
           <SuccessScreen
             mockUser={mockUser}
             selectedReason={selectedReason}
-            visitorName={visitorName}
+            detailValue={detailValue}
+            quantity={quantity}
             onBackToHome={handleBackToHome}
           />
         )}
