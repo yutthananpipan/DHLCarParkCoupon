@@ -4,19 +4,84 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Launch Chrome against localhost",
+      "name": "Launch Chrome (Dev Server)",
       "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}/src",
+      "webRoot": "${workspaceFolder}",
       "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/src/*"
+      },
       "preLaunchTask": "npm: dev"
+    },
+    {
+      "type": "msedge",
+      "request": "launch",
+      "name": "Launch Edge (Dev Server)",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/src/*"
+      },
+      "preLaunchTask": "npm: dev"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Chrome (Preview)",
+      "url": "http://localhost:4173",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "preLaunchTask": "npm: preview"
     },
     {
       "type": "chrome",
       "request": "attach",
       "name": "Attach to Chrome",
       "port": 9222,
-      "webRoot": "${workspaceFolder}/src",
+      "webRoot": "${workspaceFolder}",
       "sourceMaps": true
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Backend (TypeScript)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "watch", "server/index.ts"],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Backend (TypeScript - No Watch)",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["tsx", "server/index.ts"],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Build & Preview",
+      "configurations": ["Launch Chrome (Preview)"],
+      "preLaunchTask": "npm: build",
+      "stopAll": true
+    },
+    {
+      "name": "Full Stack Debug (Chrome + Backend)",
+      "configurations": ["Launch Chrome (Dev Server)", "Debug Backend (TypeScript)"],
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "fullstack"
+      }
     }
   ]
 }
